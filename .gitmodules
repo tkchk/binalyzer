@@ -1,3 +1,6 @@
 [submodule "imgui"]
 	path = imgui
 	url = git@github.com:ocornut/imgui.git
+[submodule "elfio"]
+	path = elfio
+	url = git@github.com:serge1/ELFIO.git
