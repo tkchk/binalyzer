@@ -7,3 +7,4 @@
 [submodule "nativefiledialog-extended"]
 	path = nativefiledialog-extended
 	url = git@github.com:btzy/nativefiledialog-extended.git
+	ignore = dirty
