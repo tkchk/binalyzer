@@ -87,26 +87,18 @@ int main(int argc, char* argv[]) {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        static float f = 0.0f;
-        static int counter = 0;
+        bool opened = true;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_MenuBar);
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        ImGui::ColorEdit4("clear color", (float*)&clear_color);
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        if (ImGui::Button("Button")) {
             NFD_OpenDialog(&outPath, NULL, 0, NULL);
-        ImGui::SameLine();
+        }
+
         ImGui::Text("counter = %s", (char *)outPath);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-        ImGui::End();
-        ImGui::Begin("Hello, new world!");
-        ImGui::Text("This is some useful text.");
         ImGui::End();
 
         // Rendering
