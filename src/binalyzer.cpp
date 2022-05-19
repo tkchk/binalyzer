@@ -2,6 +2,7 @@
 #include <string>
 #include <SDL.h>
 #include <nfd.hpp>
+#include "elfio/elfio.hpp"
 #include "binalyzer.hpp"
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -66,12 +67,16 @@ int main(int argc, char* argv[]) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Our state
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.87f, 0.2f, 0.47f, 1.00f);
     bool done = false;
 
     // Initialize File Dialog
     NFD_Init();
-    nfdchar_t *outPath;
+    nfdchar_t *outPath = NULL;
+
+    // Create elfio instance
+
+    ELFIO::elfio elf;
 
     while (!done)
     {
@@ -91,9 +96,9 @@ int main(int argc, char* argv[]) {
 
         bool opened = true;
 
-        ImGui::Begin("Open file", NULL, ImGuiWindowFlags_MenuBar);
+        // ImGui::Begin("Open file", NULL, ImGuiWindowFlags_MenuBar);
 
-        if(ImGui::BeginMenuBar())
+        if(ImGui::BeginMainMenuBar())
         {
             if(ImGui::BeginMenu("File"))
             {
@@ -106,12 +111,14 @@ int main(int argc, char* argv[]) {
                 ImGui::EndMenu();
             }
 
-            ImGui::EndMenuBar();
+            ImGui::EndMainMenuBar();
         }
 
-        ImGui::Text("You loaded %s file", (char *)outPath);
-
-        ImGui::End();
+        if (outPath) {
+            elf.load(outPath);
+            ImGui::Begin((char*)outPath, NULL, 0);
+            ImGui::End();
+        }
 
         // Rendering
         ImGui::Render();

@@ -4,6 +4,7 @@ project(binalyzer)
 # Includes. The same as -I option in gcc
 include_directories(imgui)
 include_directories(imgui/backends)
+include_directories(elfio)
 include_directories(nativefiledialog-extended/src/include)
 
 
