@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 #include <SDL.h>
 #include <nfd.hpp>
 #include "binalyzer.hpp"
@@ -59,6 +60,7 @@ int main(int argc, char* argv[]) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -89,15 +91,25 @@ int main(int argc, char* argv[]) {
 
         bool opened = true;
 
-        ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_MenuBar);
+        ImGui::Begin("Open file", NULL, ImGuiWindowFlags_MenuBar);
 
-        ImGui::ColorEdit4("clear color", (float*)&clear_color);
+        if(ImGui::BeginMenuBar())
+        {
+            if(ImGui::BeginMenu("File"))
+            {
+                if(ImGui::MenuItem("New")) {};
+                if(ImGui::MenuItem("Load...")) NFD_OpenDialog(&outPath, NULL, 0, NULL);
+                if(ImGui::MenuItem("Save...")) {};
+                if(ImGui::MenuItem("Save As...")) {};
+                if(ImGui::MenuItem("Exit")) done = true;
 
-        if (ImGui::Button("Button")) {
-            NFD_OpenDialog(&outPath, NULL, 0, NULL);
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenuBar();
         }
 
-        ImGui::Text("counter = %s", (char *)outPath);
+        ImGui::Text("You loaded %s file", (char *)outPath);
 
         ImGui::End();
 
