@@ -15,21 +15,18 @@
 
 const char* init_sdl_attributes(void) {
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
     const char* glsl_version = "#version 100";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #elif defined(__APPLE__)
-    // GL 3.2 Core + GLSL 150
     const char* glsl_version = "#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
-    // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -43,7 +40,6 @@ const char* init_sdl_attributes(void) {
 }
  
 int main(int argc, char* argv[]) {
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -74,15 +70,12 @@ int main(int argc, char* argv[]) {
     NFD_Init();
     nfdchar_t *outPath = NULL;
 
-    // Create elfio instance
-
+    // Initialize elfio instance
     ELFIO::elfio elf;
 
-    while (!done)
-    {
+    while (!done) {
         SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
+        while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 done = true;
@@ -94,18 +87,12 @@ int main(int argc, char* argv[]) {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        bool opened = true;
-
-        // ImGui::Begin("Open file", NULL, ImGuiWindowFlags_MenuBar);
-
-        if(ImGui::BeginMainMenuBar())
-        {
+        if(ImGui::BeginMainMenuBar()) {
             if(ImGui::BeginMenu("File"))
             {
                 if(ImGui::MenuItem("New")) {};
                 if(ImGui::MenuItem("Load...")) NFD_OpenDialog(&outPath, NULL, 0, NULL);
-                if(ImGui::MenuItem("Save...")) {};
-                if(ImGui::MenuItem("Save As...")) {};
+                if(ImGui::MenuItem("Unload")) outPath = NULL;;
                 if(ImGui::MenuItem("Exit")) done = true;
 
                 ImGui::EndMenu();
@@ -116,11 +103,26 @@ int main(int argc, char* argv[]) {
 
         if (outPath) {
             elf.load(outPath);
-            ImGui::Begin((char*)outPath, NULL, 0);
-            ImGui::End();
+            int sections_size = elf.sections.size();
+
+            ImGui::BeginTable(outPath, 2);
+            for (int section = 0; section < sections_size; section++) {
+                const ELFIO::section* sections = elf.sections[section];
+                std::string section_name = sections->get_name();
+                const char *data = elf.sections[section]->get_data();
+                ImGui::TableNextRow();
+                for (int column = 0; column < 2; column++) {
+                    ImGui::TableSetColumnIndex(column);
+                    if (column == 0 ) {
+                        ImGui::Text("%s", section_name.c_str());
+                    } else {
+                        ImGui::Text("%s", data);
+                    }
+                }
+            }
+            ImGui::EndTable();
         }
 
-        // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -129,7 +131,6 @@ int main(int argc, char* argv[]) {
         SDL_GL_SwapWindow(window);
     }
 
-    // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
