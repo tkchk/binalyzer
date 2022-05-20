@@ -2,6 +2,7 @@
 elfio/*
 imgui/*
 nativefiledialog-extended/*
+gdbwire/*
 
 # runtime stuff
 .vscode/*

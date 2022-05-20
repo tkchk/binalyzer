@@ -8,3 +8,6 @@
 	path = imgui
 	url = git@github.com:ocornut/imgui.git
 	branch = docking
+[submodule "gdbwire"]
+	path = gdbwire
+	url = git@github.com:brasko/gdbwire.git
